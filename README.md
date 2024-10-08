@@ -1,4 +1,4 @@
-# 📱 Phone Book Application
+# 📱 Phone Book Windows Forms
 
 ## Project Overview
 The **Phone Book Application** is a simple console-based program built with C#. It allows users to manage their contacts efficiently, providing options to view, search, add, and delete contacts. This project is a foundational step to practice C# concepts and improve coding skills through a practical application.
