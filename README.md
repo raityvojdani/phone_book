@@ -12,4 +12,4 @@ The **Phone Book Application** is a simple console-based program built with C#. 
 ## 🛠️ How to Run the Project
 1. Clone the repository:
    ```bash
-   git clone [https://github.com/YourUsername/PhoneBookApp.git](https://github.com/cs-internship/cs-internship-spec.git)
+   git clone https://github.com/raityvojdani/phone_book.git
