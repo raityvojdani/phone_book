@@ -1,128 +1,112 @@
-using System;
 using System.Data;
 using System.Data.SqlClient;
 
-namespace MyContacts
+namespace MyContacts;
+
+public class ContactRepository : IContactRepository
 {
-    public class ContactRepository : IContactRepository
+    private readonly string connectionString = "Data Source=.;Initial Catalog=Contact_DB;Integrated Security=true;";
+
+    public bool Delete(int contactID)
     {
-        private string connectionString = "Data Source=.;Initial Catalog=Cantact_DB;Integrated Security=true;";
-
-        public bool Delete(int contactID)
+        using SqlConnection sqlConnection = new(connectionString);
+        string query = "DELETE FROM MyContact WHERE ContactUserD = @ID";
+        using SqlCommand sqlCommand = new(query, sqlConnection);
+        sqlCommand.Parameters.Add("@ID", SqlDbType.Int).Value = contactID;
+        sqlConnection.Open();
+        try
         {
-            using (SqlConnection sqlConnection = new SqlConnection(connectionString))
-            {
-                try
-                {
-                    string query = "DELETE FROM MyContact WHERE ContactUserD = @ID";
-                    SqlCommand sqlCommand = new SqlCommand(query, sqlConnection);
-                    sqlCommand.Parameters.AddWithValue("@ID", contactID);
-                    sqlConnection.Open();
-                    sqlCommand.ExecuteNonQuery();
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    // Log the exception (ex) here for debugging purposes
-                    Console.WriteLine($"Error deleting contact: {ex.Message}");
-                    return false;
-                }
-            }
+            sqlCommand.ExecuteNonQuery();
+            return true;
         }
-
-        public bool Insert(string name, string family, string mobile, string email, string address, int age)
+        catch (Exception ex)
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                try
-                {
-                    string query = "INSERT INTO MyContact (Name, Family, Mobile, Email, Age, Address) VALUES (@Name, @Family, @Mobile, @Email, @Age, @Address)";
-                    SqlCommand cmd = new SqlCommand(query, connection);
-
-                    cmd.Parameters.AddWithValue("@Name", name);
-                    cmd.Parameters.AddWithValue("@Family", family);
-                    cmd.Parameters.AddWithValue("@Mobile", mobile);
-                    cmd.Parameters.AddWithValue("@Email", email);
-                    cmd.Parameters.AddWithValue("@Age", age);
-                    cmd.Parameters.AddWithValue("@Address", address);
-                    connection.Open();
-                    cmd.ExecuteNonQuery();
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    // Log the exception (ex) here for debugging purposes
-                    Console.WriteLine($"Error inserting contact: {ex.Message}");
-                    return false;
-                }
-            }
+            // Log the exception (ex) here for debugging purposes
+            Console.WriteLine($"Error deleting contact: {ex.Message}");
+            return false;
         }
+    }
 
-        public DataTable Search(string parameter)
+    public bool Insert(string name, string family, string mobile, string email, string address, int age)
+    {
+        using SqlConnection connection = new(connectionString);
+        string query = "INSERT INTO MyContact (Name, Family, Mobile, Email, Age, Address) VALUES (@Name, @Family, @Mobile, @Email, @Age, @Address)";
+        using SqlCommand cmd = new(query, connection);
+        cmd.Parameters.Add("@Name", SqlDbType.NVarChar).Value = name;
+        cmd.Parameters.Add("@Family", SqlDbType.NVarChar).Value = family;
+        cmd.Parameters.Add("@Mobile", SqlDbType.NVarChar).Value = mobile;
+        cmd.Parameters.Add("@Email", SqlDbType.NVarChar).Value = email;
+        cmd.Parameters.Add("@Age", SqlDbType.Int).Value = age;
+        cmd.Parameters.Add("@Address", SqlDbType.NVarChar).Value = address;
+        connection.Open();
+        try
         {
-            string query = "SELECT * FROM MyContact WHERE Name LIKE @parameter OR Family LIKE @parameter";
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                SqlDataAdapter adapter = new SqlDataAdapter(query, connection);
-                adapter.SelectCommand.Parameters.AddWithValue("@parameter", "%" + parameter + "%");
-                DataTable dataTable = new DataTable();
-                adapter.Fill(dataTable);
-                return dataTable;
-            }
+            cmd.ExecuteNonQuery();
+            return true;
         }
-
-        public DataTable SelectAll()
+        catch (Exception ex)
         {
-            string query = "SELECT * FROM MyContact";
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                SqlDataAdapter adapter = new SqlDataAdapter(query, connection);
-                DataTable dataTable = new DataTable();
-                adapter.Fill(dataTable);
-                return dataTable;
-            }
+            // Log the exception (ex) here for debugging purposes
+            Console.WriteLine($"Error inserting contact: {ex.Message}");
+            return false;
         }
+    }
 
-        public DataTable SelectRow(int contactID)
+    public DataTable Search(string parameter)
+    {
+        string query = "SELECT * FROM MyContact WHERE Name LIKE @parameter OR Family LIKE @parameter";
+        using SqlConnection connection = new(connectionString);
+        using SqlDataAdapter adapter = new(query, connection);
+        adapter.SelectCommand.Parameters.Add("@parameter", SqlDbType.NVarChar).Value = "%" + parameter + "%";
+        DataTable dataTable = new();
+        adapter.Fill(dataTable);
+        return dataTable;
+    }
+
+    public DataTable SelectAll()
+    {
+        string query = "SELECT * FROM MyContact";
+        using SqlConnection connection = new(connectionString);
+        using SqlDataAdapter adapter = new(query, connection);
+        DataTable dataTable = new();
+        adapter.Fill(dataTable);
+        return dataTable;
+    }
+
+    public DataTable SelectRow(int contactID)
+    {
+        string query = "SELECT * FROM MyContact WHERE ContactUserD = @ID";
+        using SqlConnection connection = new(connectionString);
+        using SqlDataAdapter adapter = new(query, connection);
+        adapter.SelectCommand.Parameters.Add("@ID", SqlDbType.Int).Value = contactID;
+        DataTable dataTable = new();
+        adapter.Fill(dataTable);
+        return dataTable;
+    }
+
+    public bool Update(int contactID, string name, string family, string mobile, string email, string address, int age)
+    {
+        using SqlConnection connection = new(connectionString);
+        string query = "UPDATE MyContact SET Name = @Name, Family = @Family, Mobile = @Mobile, Email = @Email, Age = @Age, Address = @Address WHERE ContactUserD = @ID";
+        using SqlCommand cmd = new(query, connection);
+        cmd.Parameters.Add("@ID", SqlDbType.Int).Value = contactID;
+        cmd.Parameters.Add("@Name", SqlDbType.NVarChar).Value = name;
+        cmd.Parameters.Add("@Family", SqlDbType.NVarChar).Value = family;
+        cmd.Parameters.Add("@Mobile", SqlDbType.NVarChar).Value = mobile;
+        cmd.Parameters.Add("@Email", SqlDbType.NVarChar).Value = email;
+        cmd.Parameters.Add("@Age", SqlDbType.Int).Value = age;
+        cmd.Parameters.Add("@Address", SqlDbType.NVarChar).Value = address;
+        connection.Open();
+        try
         {
-            string query = "SELECT * FROM MyContact WHERE ContactUserD = @ID";
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                SqlDataAdapter adapter = new SqlDataAdapter(query, connection);
-                adapter.SelectCommand.Parameters.AddWithValue("@ID", contactID);
-                DataTable dataTable = new DataTable();
-                adapter.Fill(dataTable);
-                return dataTable;
-            }
+            cmd.ExecuteNonQuery();
+            return true;
         }
-
-        public bool Update(int contactID, string name, string family, string mobile, string email, string address, int age)
+        catch (Exception ex)
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                try
-                {
-                    string query = "UPDATE MyContact SET Name = @Name, Family = @Family, Mobile = @Mobile, Email = @Email, Age = @Age, Address = @Address WHERE ContactUserD = @ID";
-                    SqlCommand cmd = new SqlCommand(query, connection);
-
-                    cmd.Parameters.AddWithValue("@ID", contactID);
-                    cmd.Parameters.AddWithValue("@Name", name);
-                    cmd.Parameters.AddWithValue("@Family", family);
-                    cmd.Parameters.AddWithValue("@Mobile", mobile);
-                    cmd.Parameters.AddWithValue("@Email", email);
-                    cmd.Parameters.AddWithValue("@Age", age);
-                    cmd.Parameters.AddWithValue("@Address", address);
-                    connection.Open();
-                    cmd.ExecuteNonQuery();
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    // Log the exception (ex) here for debugging purposes
-                    Console.WriteLine($"Error updating contact: {ex.Message}");
-                    return false;
-                }
-            }
+            // Log the exception (ex) here for debugging purposes
+            Console.WriteLine($"Error updating contact: {ex.Message}");
+            return false;
         }
     }
 }

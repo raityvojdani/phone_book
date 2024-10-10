@@ -1,6 +1,4 @@
-using System;
 using System.Data;
-using System.Windows.Forms;
 
 namespace MyContacts;
 
@@ -20,13 +18,9 @@ public partial class frmEditOrAdd : Form
 
     private void frmEditOrAdd_Load(object sender, EventArgs e)
     {
-        if (ContactId == 0)
+        Text = ContactId == 0 ? "افزودن شخص جدید" : "ویرایش کاربر";
+        if (ContactId != 0)
         {
-            this.Text = "افزودن شخص جدید";
-        }
-        else
-        {
-            this.Text = "ویرایش کاربر";
             LoadContactDetails();
             btnSubmit.Text = "ویرایش";
         }
@@ -38,12 +32,16 @@ public partial class frmEditOrAdd : Form
     private void LoadContactDetails()
     {
         DataTable dt = _contactRepository.SelectRow(ContactId);
-        NameBox.Text = dt.Rows[0][1].ToString();
-        FamilyBox.Text = dt.Rows[0][2].ToString();
-        MobileBox.Text = dt.Rows[0][3].ToString();
-        EmailBox.Text = dt.Rows[0][4].ToString();
-        AgeBox.Text = dt.Rows[0][5].ToString();
-        AddressBox.Text = dt.Rows[0][6].ToString();
+        if (dt.Rows.Count > 0)
+        {
+            var row = dt.Rows[0];
+            NameBox.Text = row[1].ToString();
+            FamilyBox.Text = row[2].ToString();
+            MobileBox.Text = row[3].ToString();
+            EmailBox.Text = row[4].ToString();
+            AgeBox.Text = row[5].ToString();
+            AddressBox.Text = row[6].ToString();
+        }
     }
 
     /// <summary>
@@ -54,30 +52,35 @@ public partial class frmEditOrAdd : Form
     {
         if (string.IsNullOrWhiteSpace(NameBox.Text))
         {
-            MessageBox.Show("نام را وارد کنید", "هشدار", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            ShowError("نام را وارد کنید");
             return false;
         }
         if (string.IsNullOrWhiteSpace(FamilyBox.Text))
         {
-            MessageBox.Show("نام خانوادگی را وارد کنید", "هشدار", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            ShowError("نام خانوادگی را وارد کنید");
             return false;
         }
         if (string.IsNullOrWhiteSpace(EmailBox.Text))
         {
-            MessageBox.Show("ایمیل را وارد کنید", "هشدار", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            ShowError("ایمیل را وارد کنید");
             return false;
         }
         if (AgeBox.Value == 0)
         {
-            MessageBox.Show("سن را وارد کنید", "هشدار", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            ShowError("سن را وارد کنید");
             return false;
         }
         if (string.IsNullOrWhiteSpace(MobileBox.Text))
         {
-            MessageBox.Show("موبایل را وارد کنید", "هشدار", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            ShowError("موبایل را وارد کنید");
             return false;
         }
         return true;
+    }
+
+    private void ShowError(string message)
+    {
+        MessageBox.Show(message, "هشدار", MessageBoxButtons.OK, MessageBoxIcon.Error);
     }
 
     private void btnSubmit_Click(object sender, EventArgs e)
@@ -86,14 +89,14 @@ public partial class frmEditOrAdd : Form
         {
             bool isSuccess = ContactId == 0 ? AddContact() : UpdateContact();
 
+            MessageBox.Show(isSuccess ? "عملیات با موفقیت انجام شد" : "عملیات با خطا مواجه شد",
+                            isSuccess ? "موفقیت آمیز" : "خطا",
+                            MessageBoxButtons.OK,
+                            isSuccess ? MessageBoxIcon.Information : MessageBoxIcon.Error);
+
             if (isSuccess)
             {
-                MessageBox.Show("عملیات با موفقیت انجام شد", "موفقیت آمیز", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 DialogResult = DialogResult.OK;
-            }
-            else
-            {
-                MessageBox.Show("عملیات با خطا مواجه شد", "خطا", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

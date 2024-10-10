@@ -5,7 +5,7 @@
 /// </summary>
 public partial class Form1 : Form
 {
-    private IContactRepository _contactRepository;
+    private readonly IContactRepository _contactRepository;
 
     public Form1()
     {
@@ -47,7 +47,7 @@ public partial class Form1 : Form
     /// </summary>
     private void OpenEditOrAddForm()
     {
-        frmEditOrAdd frmAddOrEdit = new frmEditOrAdd();
+        frmEditOrAdd frmAddOrEdit = new();
         frmAddOrEdit.ShowDialog();
         if (frmAddOrEdit.DialogResult == DialogResult.OK)
         {
@@ -67,14 +67,20 @@ public partial class Form1 : Form
     {
         if (dgContacts.CurrentRow != null)
         {
-            string name = dgContacts.CurrentRow.Cells[1].Value.ToString();
-            string family = dgContacts.CurrentRow.Cells[2].Value.ToString();
-            string fullName = name + " " + family;
+            string? name = dgContacts.CurrentRow.Cells[1].Value?.ToString();
+            string? family = dgContacts.CurrentRow.Cells[2].Value?.ToString();
+            string fullName = (name ?? "") + " " + (family ?? "");
             if (MessageBox.Show($"ایا از حذف {fullName} اطمینان دارید؟", "توجه", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                int contactID = int.Parse(dgContacts.CurrentRow.Cells[0].Value.ToString());
-                _contactRepository.Delete(contactID);
-                BindGrid();
+                if (int.TryParse(dgContacts.CurrentRow.Cells[0].Value?.ToString(), out int contactID))
+                {
+                    _contactRepository.Delete(contactID);
+                    BindGrid();
+                }
+                else
+                {
+                    MessageBox.Show("شناسه مخاطب نامعتبر است");
+                }
             }
         }
         else
@@ -95,12 +101,20 @@ public partial class Form1 : Form
     {
         if (dgContacts.CurrentRow != null)
         {
-            int contactID = int.Parse(dgContacts.CurrentRow.Cells[0].Value.ToString());
-            frmEditOrAdd frmEdit = new frmEditOrAdd();
-            frmEdit.contactId = contactID;
-            if (frmEdit.ShowDialog() == DialogResult.OK)
+            if (int.TryParse(dgContacts.CurrentRow.Cells[0].Value?.ToString(), out int contactID))
             {
-                BindGrid();
+                frmEditOrAdd frmEdit = new()
+                {
+                    ContactId = contactID
+                };
+                if (frmEdit.ShowDialog() == DialogResult.OK)
+                {
+                    BindGrid();
+                }
+            }
+            else
+            {
+                MessageBox.Show("شناسه مخاطب نامعتبر است");
             }
         }
         else
