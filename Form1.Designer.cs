@@ -38,7 +38,7 @@ partial class Form1
         groupBox2 = new GroupBox();
         btnDelete = new Button();
         btnEdit = new Button();
-        dgContacs = new DataGridView();
+        dgContacts = new DataGridView();
         ID = new DataGridViewTextBoxColumn();
         MyName = new DataGridViewTextBoxColumn();
         Family = new DataGridViewTextBoxColumn();
@@ -48,7 +48,7 @@ partial class Form1
         addNewContact.SuspendLayout();
         searchBox.SuspendLayout();
         groupBox2.SuspendLayout();
-        ((System.ComponentModel.ISupportInitialize)dgContacs).BeginInit();
+        ((System.ComponentModel.ISupportInitialize)dgContacts).BeginInit();
         SuspendLayout();
         // 
         // addNewContact
@@ -113,7 +113,7 @@ partial class Form1
         // 
         groupBox2.Controls.Add(btnDelete);
         groupBox2.Controls.Add(btnEdit);
-        groupBox2.Controls.Add(dgContacs);
+        groupBox2.Controls.Add(dgContacts);
         groupBox2.Location = new Point(0, 104);
         groupBox2.Name = "groupBox2";
         groupBox2.Size = new Size(800, 303);
@@ -141,19 +141,19 @@ partial class Form1
         btnEdit.UseVisualStyleBackColor = true;
         btnEdit.Click += btnEdit_Click;
         // 
-        // dgContacs
+        // dgContacts
         // 
-        dgContacs.AllowUserToAddRows = false;
-        dgContacs.AllowUserToDeleteRows = false;
-        dgContacs.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-        dgContacs.Columns.AddRange(new DataGridViewColumn[] { ID, MyName, Family, Mobile, Email, Age });
-        dgContacs.Location = new Point(6, 48);
-        dgContacs.Name = "dgContacs";
-        dgContacs.ReadOnly = true;
-        dgContacs.RowHeadersWidth = 51;
-        dgContacs.Size = new Size(788, 184);
-        dgContacs.TabIndex = 0;
-        dgContacs.CellContentClick += dgContacs_CellContentClick;
+        dgContacts.AllowUserToAddRows = false;
+        dgContacts.AllowUserToDeleteRows = false;
+        dgContacts.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+        dgContacts.Columns.AddRange(new DataGridViewColumn[] { ID, MyName, Family, Mobile, Email, Age });
+        dgContacts.Location = new Point(6, 48);
+        dgContacts.Name = "dgContacts";
+        dgContacts.ReadOnly = true;
+        dgContacts.RowHeadersWidth = 51;
+        dgContacts.Size = new Size(788, 184);
+        dgContacts.TabIndex = 0;
+        dgContacts.CellContentClick += dgContacts_CellContentClick;
         // 
         // ID
         // 
@@ -229,7 +229,7 @@ partial class Form1
         searchBox.ResumeLayout(false);
         searchBox.PerformLayout();
         groupBox2.ResumeLayout(false);
-        ((System.ComponentModel.ISupportInitialize)dgContacs).EndInit();
+        ((System.ComponentModel.ISupportInitialize)dgContacts).EndInit();
         ResumeLayout(false);
         PerformLayout();
     }
@@ -239,7 +239,7 @@ partial class Form1
     private ToolStrip addNewContact;
     private GroupBox searchBox;
     private GroupBox groupBox2;
-    private DataGridView dgContacs;
+    private DataGridView dgContacts;
     private ToolStripButton addNewUser;
     private ToolStripButton btnRefresh;
     private Button btnDelete;
