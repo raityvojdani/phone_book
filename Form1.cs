@@ -70,7 +70,7 @@ public partial class Form1 : Form
             string name = dgContacts.CurrentRow.Cells[1].Value.ToString();
             string family = dgContacts.CurrentRow.Cells[2].Value.ToString();
             string fullName = name + " " + family;
-            if (MessageBox.Show($"Are you sure you want to delete {fullName}?", "Attention", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            if (MessageBox.Show($"ایا از حذف {fullName} اطمینان دارید؟", "توجه", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
                 int contactID = int.Parse(dgContacts.CurrentRow.Cells[0].Value.ToString());
                 _contactRepository.Delete(contactID);
@@ -79,7 +79,7 @@ public partial class Form1 : Form
         }
         else
         {
-            MessageBox.Show("Please select a row.");
+            MessageBox.Show("سطر مورد نظر را انتخاب کنید");
         }
     }
 
@@ -105,7 +105,7 @@ public partial class Form1 : Form
         }
         else
         {
-            MessageBox.Show("Please select a row.");
+            MessageBox.Show("سطر مورد نظر را انتخاب کنید");
         }
     }
 
