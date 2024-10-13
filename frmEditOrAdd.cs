@@ -1,100 +1,121 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace MyContacts;
+
+/// <summary>
+/// Form for adding or editing a contact.
+/// </summary>
 public partial class frmEditOrAdd : Form
 {
-    public int contactId = 0;
-    IContactRepository contactRepository;
+    public int ContactId { get; set; } = 0;
+    private readonly IContactRepository _contactRepository;
+
     public frmEditOrAdd()
     {
         InitializeComponent();
-        contactRepository = new ContactRepository();
+        _contactRepository = new ContactRepository();
     }
-
-
 
     private void frmEditOrAdd_Load(object sender, EventArgs e)
     {
-        if (contactId == 0)
+        Text = ContactId == 0 ? "افزودن شخص جدید" : "ویرایش کاربر";
+        if (ContactId != 0)
         {
-            this.Text="افزودن شخص جدید";
-        }
-        else { 
-            this.Text="ویرایش کاربر";
-            DataTable dt = contactRepository.SelectRow(contactId);
-            NameBox.Text = dt.Rows[0][1].ToString();
-            FamilyBox.Text = dt.Rows[0][2].ToString();
-            MobileBox.Text = dt.Rows[0][3].ToString();
-            EmailBox.Text = dt.Rows[0][4].ToString();
-            AgeBox.Text = dt.Rows[0][5].ToString();
-            AddressBox.Text = dt.Rows[0][6].ToString();
+            LoadContactDetails();
             btnSubmit.Text = "ویرایش";
-
         }
     }
 
-    bool validateInputs()
+    /// <summary>
+    /// Loads the contact details into the form fields.
+    /// </summary>
+    private void LoadContactDetails()
     {
-        if (NameBox.Text == "")
+        DataTable dt = _contactRepository.SelectRow(ContactId);
+        if (dt.Rows.Count > 0)
         {
-            MessageBox.Show("نام را وارد کنید", "هشدار", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            var row = dt.Rows[0];
+            NameBox.Text = row[1].ToString();
+            FamilyBox.Text = row[2].ToString();
+            MobileBox.Text = row[3].ToString();
+            EmailBox.Text = row[4].ToString();
+            AgeBox.Text = row[5].ToString();
+            AddressBox.Text = row[6].ToString();
+        }
+    }
+
+    /// <summary>
+    /// Validates the input fields.
+    /// </summary>
+    /// <returns>True if all inputs are valid, otherwise false.</returns>
+    private bool ValidateInputs()
+    {
+        if (string.IsNullOrWhiteSpace(NameBox.Text))
+        {
+            ShowError("نام را وارد کنید");
             return false;
         }
-        if (FamilyBox.Text == "")
+        if (string.IsNullOrWhiteSpace(FamilyBox.Text))
         {
-            MessageBox.Show("نام خانوادگی را وارد کنید", "هشدار", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            ShowError("نام خانوادگی را وارد کنید");
             return false;
         }
-        if (EmailBox.Text == "")
+        if (string.IsNullOrWhiteSpace(EmailBox.Text))
         {
-            MessageBox.Show("ایمیل را وارد کنید", "هشدار", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            ShowError("ایمیل را وارد کنید");
             return false;
         }
         if (AgeBox.Value == 0)
         {
-            MessageBox.Show("سن را وارد کنید", "هشدار", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            ShowError("سن را وارد کنید");
             return false;
         }
-        if (MobileBox.Text == "")
+        if (string.IsNullOrWhiteSpace(MobileBox.Text))
         {
-            MessageBox.Show("موبایل را وارد کنید", "هشدار", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            ShowError("موبایل را وارد کنید");
             return false;
         }
         return true;
     }
 
+    private void ShowError(string message)
+    {
+        MessageBox.Show(message, "هشدار", MessageBoxButtons.OK, MessageBoxIcon.Error);
+    }
+
     private void btnSubmit_Click(object sender, EventArgs e)
     {
-        if (validateInputs())
+        if (ValidateInputs())
         {
-            bool isSuccess;
-            if (contactId == 0)
-            {
-                isSuccess = contactRepository.Insert(NameBox.Text, FamilyBox.Text, MobileBox.Text, EmailBox.Text, AddressBox.Text, (int)AgeBox.Value);
+            bool isSuccess = ContactId == 0 ? AddContact() : UpdateContact();
 
-            }
-            else
-            {
-                isSuccess = contactRepository.Update(contactId,NameBox.Text, FamilyBox.Text, MobileBox.Text, EmailBox.Text, AddressBox.Text, (int)AgeBox.Value);
-
-            }
+            MessageBox.Show(isSuccess ? "عملیات با موفقیت انجام شد" : "عملیات با خطا مواجه شد",
+                            isSuccess ? "موفقیت آمیز" : "خطا",
+                            MessageBoxButtons.OK,
+                            isSuccess ? MessageBoxIcon.Information : MessageBoxIcon.Error);
 
             if (isSuccess)
             {
-                MessageBox.Show("عملیات با موفقیت انجام شد", "موفقیت آمیز", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                DialogResult = DialogResult.OK; 
-            }
-            else {
-                MessageBox.Show("عملیات با خطا مواجه شد","خطا",MessageBoxButtons.OK,MessageBoxIcon.Error);
+                DialogResult = DialogResult.OK;
             }
         }
+    }
+
+    /// <summary>
+    /// Adds a new contact.
+    /// </summary>
+    /// <returns>True if the operation is successful, otherwise false.</returns>
+    private bool AddContact()
+    {
+        return _contactRepository.Insert(NameBox.Text, FamilyBox.Text, MobileBox.Text, EmailBox.Text, AddressBox.Text, (int)AgeBox.Value);
+    }
+
+    /// <summary>
+    /// Updates an existing contact.
+    /// </summary>
+    /// <returns>True if the operation is successful, otherwise false.</returns>
+    private bool UpdateContact()
+    {
+        return _contactRepository.Update(ContactId, NameBox.Text, FamilyBox.Text, MobileBox.Text, EmailBox.Text, AddressBox.Text, (int)AgeBox.Value);
     }
 }
